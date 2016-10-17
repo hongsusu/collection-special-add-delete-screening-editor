@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="zh-CN" ng-app="qingniwan.admin">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>INVITE有你更精彩</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content="">
+    <!-- bootstrap css -->
+    <link rel="stylesheet" type="text/css" href="/plugins/bootstrap/css/bootstrap.min.css">
+    <!-- main.css-->
+    <link rel="stylesheet" type="text/css" href="/css/admin/main.css">
+    <!-- iconfont.css-->
+    <link rel="stylesheet" type="text/css" href="/fonts/iconfont.css">
+    <style>
+
+        .modal input {
+            margin-bottom: 10px;
+        }
+
+        .modal-body {
+            overflow: hidden;
+        }
+
+        #wrappers .cropper-wrapers {
+            position: relative;
+            height: 280px;
+        }
+
+        .webuploader-element-invisibles {
+            position: absolute !important;
+            clip: rect(1px 1px 1px 1px);
+            clip: rect(1px, 1px, 1px, 1px);
+        }
+
+        .upload-btns {
+            background: #fff;
+            border: 1px solid #fff;
+            color: #404040;
+            padding: 10px 18px;
+            display: inline-block;
+            border-radius: 3px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .6);
+            position: absolute;
+            right: -260px;
+            bottom: -50px;
+            z-index: 1000;
+        }
+
+        #wrappers .cropper-wrapers .img-previews {
+            position: absolute;
+            right: -290px;
+            top: -30px;
+            width: 300px;
+            height: 160px;
+            margin-top: 1em;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 30px rgba(0, 0, 0, .6);
+        }
+
+        .webuploader-picks:before, .webuploader-picks:after {
+            content: '';
+            display: block;
+            padding-top: 25%;
+        }
+
+        .ItemStyle{
+            position: relative;
+        }
+        .stateStyle{
+               position: absolute;
+               top:50%;
+               right: 0;
+
+           }
+
+    </style>
+</head>
+<body ng-controller="specialController" ng-init="initializeBaseData()">
+
+<div class="container-fluid J_container_overflow">
+
+    <!-- top nav -->
+    <div class="wui-topnav">
+        <div class="row">
+            <div class="col-md-1 col-xs-12 logo">
+                <img src="/images/admin/logo.svg">
+            </div>
+            <div class="col-md-11 col-xs-12 J_topnav-padding">
+                <ul class="wui-topnav-ul">
+                    <li><a href="/?source=1">全部内容</a></li>
+                    <li><a href="/Qnw/release">发布内容</a></li>
+                    <li class="active"><a href="/special/index">专题管理</a></li>
+                    <li><a href="/special/create">发布专题</a></li>
+                    <li><a href="/collection/index">专集管理</a></li>
+                    <li><a href="/collectioneditor/index">发布专集</a></li>
+                  <!--  <li><a href="/usercontrol/index">用户管理</a></li>-->
+                    <li><a href="/statistics/index">数据统计</a></li>
+                    <li><a href="/feedbacks/index">反馈管理</a></li>
+                   <!-- <li><a href="/setting/index">管理员设置</a></li>-->
+                </ul>
+                <li class="J_account pull-right wui-topnav-login" ng-click="logout()">&nbsp;&nbsp;退出</li>
+                <li class="J_account pull-right">您好，<?php session_start();
+                    echo $_SESSION['userName']; ?></li>
+                <li class="pull-right wui-topnav-publish J_topnav_publish" data-toggle="modal" data-target=".create-event">
+                </li>
+            </div>
+        </div>
+    </div>
+
+    <!-- content -->
+    <div class="wui-content">
+        <div class="row">
+
+            <!-- left nav -->
+            <div class="col-md-1 col-xs-12 side" style="text-align:center">
+                <div class="row">
+                    <div class="wui-leftnav J_pc_nav">
+                        <ul>
+                            <li ng-click="filter('/Special/specialRequest','cityID','888888')">全部地区</li>
+                            <?php foreach ($cityinfo as $v) { ?>
+                                <li ng-click="filter('/Special/specialRequest','cityID',<?php echo $v['uuid']; ?>)"
+                                    id="J_area<?php echo $v['uuid']; ?>">
+                                    <!--class="active"--><?php echo $v['city']; ?>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6 col-xs-offset-3">
+                        <div id="J_mobile_nav" class="dropdown wui-mobile-nav" style="display:none;">
+						  	<span id="dLabel" data-target="#" data-toggle="dropdown" role="button" aria-haspopup="true"
+                                  aria-expanded="false">
+						    	<span id="J_mobile_nav_txt">全部地区</span>
+						    	<span class="caret"></span>
+						  	</span>
+                            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                                <?php foreach ($cityinfo as $v) { ?>
+                                    <li ng-click="filter('<?php echo $url; ?>','cityID',<?php echo $v['uuid']; ?>)">
+                                        <!--class="active"--><a><?php echo $v['city']; ?></a>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- main -->
+            <div class="col-md-8 col-xs-12 main">
+                <div class="row">
+
+                    <!-- main filter -->
+                    <div class="wui-main-filter clearfix">
+                        <div class="btn-group pull-left">
+
+                            <!--发布专题 start-->
+                            <button ng-click="publicSpecialBtn()" style="display:none" type="button" class="btn btn-default" role="button" data-toggle="modal" data-target="#publicSpecial">
+                                <span class="J_filter_public_txt">发布专题</span>
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                            <!--发布专题 end-->
+
+                            <!-- 推荐状态 start-->
+                            <div class="btn-group J_filter_status">
+                                <button type="button" id="dLabel1" class="btn btn-default dropdown-toggle" data-target="#"
+                                        data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="border-radius:5px">
+                                    <span class="J_filter_status_txt">推荐状态</span>
+                                    <span class="caret"></span>
+                                </button>
+
+                                <ul class="dropdown-menu" aria-labelledby="dLabel1">
+                                    <?php foreach ($statusuuid as $k => $v) { ?>
+                                        <li>
+                                            <a href="javascript:" ng-click="filter('/Special/specialRequest','status',<?php echo $k; ?>)"><?php echo $v; ?> </a>
+                                        </li>
+                                    <?php } ?>
+                                </ul>
+                            </div>
+                            <!-- 推荐状态 end-->
+
+                        </div>
+                        <div class="pull-right clearfix">
+                            <!-- 搜索 -->
+                            <div class="form-inline pull-right">
+                                <input type="text" id="searchKeyword" name="searchKeyword" ng-model="searchKeywordText" class="form-control"
+                                       placeholder="请输入专题名称" required data-oninvalid="请输入专题名称">
+                                <button type="submit" class="btn btn-default"
+                                        ng-click="searchByKeyword('/Special/specialRequest','title',searchKeywordText)">
+                                    搜索
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- main listinfo -->
+                    <div class="wui-main J_main_scrollTop">
+                        <div class="wui-main-listinfo">
+                            <div class="wui-main-info J_main_info" ng-repeat="infoData in publickSpecialData.listInfoDatas track by $index" on-finish-render="callMyCustomMethod">
+                                <div class="row ItemStyle">
+                                    <!-- <div class="J_checkBox wui-md-offset-1">
+                                        <input type="checkbox">
+                                    </div> -->
+                                    <div class="col-md-2" ng-click="preview(infoData.url)">
+                                        <a href=""><img src="{{infoData.coverUrl}}" class="img-responsive"></a>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <h4><span ng-bind="infoData.title"></span></h4>
+
+                                        <!--
+                                                                                <style>
+                                                                                    .input-editable {
+                                                                                        display: inline-block;
+                                                                                        border: 1px solid transparent;
+                                                                                        width: 320px !important;
+                                                                                    }
+
+                                                                                    .input-editable:hover,
+                                                                                    .input-editable:focus {
+                                                                                        border: 1px solid #ccc;
+                                                                                    }
+                                                                                </style>-->
+
+                                        <p><span ng-bind="infoData.specialDescribe" class="text-muted"></p>
+                                    </div>
+                                    <div class="col-md-5 stateStyle">
+                                        <div class="row">
+                                            <div class="col-md-4" style="display:none">
+
+                                                <a href="javascript:" data-target="#editorSpecial" data-toggle="modal" ng-click="editorData(infoData, $index)">
+                                                    编辑
+                                                </a>
+
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button id="copy-button{{infoData.id}}" data-clipboard-text="{{infoData.url}}" title="Click to copy me." class="btn btn-default">复制URL</button>
+                                            </div>
+
+                                            <div class="col-md-8">
+
+                                                <div class="row">
+
+                                                    <span class="badge" ng-bind="infoData.status"></span>
+
+                                                    <!-- Split button -->
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-primary" ng-click="audit(infoData.id, 1, $index)">
+                                                            上架
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            &nbsp;<span class="caret"></span>&nbsp;
+                                                            <span class="sr-only">Toggle Dropdown</span>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a href="javascript:" ng-click="audit(infoData.id,3, $index)">下架</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript:" ng-click="audit(infoData.id,8, $index)">
+                                                                    设置为二级专题
+                                                                </a>
+                                                            </li>
+                                                            <li role="separator" class="divider"></li>
+                                                            <li>
+                                                                <a href="javascript:" ng-click="JumpToSpecialPublishPage(infoData, $index)">
+                                                                    转到新页面编辑
+                                                                </a>
+                                                            </li>
+
+                                                        </ul>
+                                                    </div>
+
+                                                    <button data-toggle="modal" data-target="#delete-modal" type="button"
+                                                            class="btn btn-danger" ng-click="delmodal(infoData.id, $index)">
+                                                        删除
+                                                    </button>
+
+
+
+
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- main page -->
+                    <div class="wui-main-page">
+                        <nav>
+                            <ul class="pagination J_pagination">
+                                <li id="J_pagePre">
+                                    <a aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <div class="J_main_page wui-page-list">
+                                </div>
+                                <li id="J_pageNext">
+                                    <a aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- right preview -->
+            <div class="col-md-3 col-xs-12 extra">
+                <div class="row">
+
+                    <div class="wui-preview">
+                        <div class="wui-preview-tit" style="height:54px;">
+                            <h4>预览</h4>
+                        </div>
+                        <iframe style="padding-bottom: .2rem" id="J_preview" frameborder="no" border="0" width="100%"
+                                height="100%"></iframe>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认弹出框 -->
+<div class="modal fade" id="delete-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">删除</h4>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger J_delete_btn" data-dismiss="modal">确定删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--发布专题弹出框-->
+<div class="modal fade" id="publicSpecial" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">发布专题</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+
+                    <div class="form-group">
+                        <labe lcontrol-label
+                        ">专题名称</label>
+                        <div>
+                            <input type="text" placeholder="请输入专题名称" class="form-control" ng-model="CREATEDATA.title">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">专题描述</label>
+
+                        <input type="text" placeholder="专题描述" class="form-control" ng-model="CREATEDATA.specialDescribe">
+
+                    </div>
+                    <div class="form-group">
+
+
+                        <div id="wrapper" style="width:300px;">
+                            <div class="uploader-container">
+                                <div id="filePicker">点击上传海报</div>
+                            </div>
+
+                            <!-- Croper container -->
+                            <div class="cropper-wraper webuploader-element-invisible">
+                                <div class="img-container">
+                                    <img src="" alt=""/>
+                                </div>
+
+                                <div class="upload-btn">上传所选区域</div>
+
+                                <div class="img-preview"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">模板链接</label>
+
+                        <input type="text" placeholder="模板链接" class="form-control" ng-model="CREATEDATA.templateUrl">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">链接地址</label>
+
+                        <input type="text" placeholder="链接地址" class="form-control" ng-model="CREATEDATA.url" readonly>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">城市</label>
+
+                        <select class="form-control wui-inline"
+                                ng-options="item.cityName for item in cities track by item.cityID"
+                                ng-model="currentSelectedCityForPublish"
+                                ng-change="updatePulishData()"></select>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default J_publick_btnClose">关闭</button>
+                <button type="button" class="btn btn-primary J_publick_btn">确认发布</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--编辑专题弹出框-->
+<div class="modal fade" id="editorSpecial" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">编辑专题</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label class="control-label">专题名称</label>
+
+                        <input type="text" placeholder="请输入专题名称" class="form-control" ng-model="infoDataObject.title">
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">专题描述</label>
+
+                        <input type="text" placeholder="专题描述" class="form-control" ng-model="infoDataObject.specialDescribe">
+
+                    </div>
+                    <div class="form-group">
+
+                        <div id="wrappers" style="width:300px;">
+                            <div class="uploader-containers">
+                                <div id="filePickers">点击上传海报</div>
+                            </div>
+
+                            <!-- Croper container -->
+                            <div class="cropper-wrapers webuploader-element-invisibles">
+                                <div class="img-containers">
+                                    <img src="" alt=""/>
+                                </div>
+
+                                <div class="upload-btns">上传所选区域</div>
+
+                                <div class="img-previews"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">模板链接</label>
+
+                        <input type="text" placeholder="模板链接" class="form-control" ng-model="infoDataObject.templateUrl">
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">链接地址</label>
+
+                        <input type="text" placeholder="链接地址" class="form-control" ng-model="infoDataObject.url" readonly>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">城市</label>
+
+                        <select class="form-control wui-inline"
+                                ng-options="item.cityName for item in cities track by item.cityID"
+                                ng-model="currentSelectedCityForPublish"
+                                ng-change="updatePulishData()"></select>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary J_editorSpecial_btn" data-dismiss="modal">确认修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 后台动态接口 -->
+<div class="interface-info">
+    <input id="J_default_interface" type="hidden" value="<?php echo $source[$sourceid]['interface']; ?>">
+    <input id="J_default_form" type="hidden" value="<?php echo $source[$sourceid]['name']; ?>">
+    <input id="J_default_city" type="hidden" value="<?php echo current($cityinfo)['uuid']; ?>">
+</div>
+
+
+<!-- jquery -->
+<script type="text/javascript" src="/js/framwork/jquery-1.11.1.min.js"></script>
+
+<!-- bootstrap js -->
+<script type="text/javascript" src="/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+<!-- angular js -->
+<script type="text/javascript" src="/js/framwork/angular.min.js"></script>
+
+<!--自定义工具类-->
+<script type="text/javascript" src="/js/model/controllers/specialController.js"></script>
+<script type="text/javascript" src="/js/model/factory/H5Factory.js"></script>
+
+<!-- artDialog -->
+<link rel="stylesheet" href="/plugins/artDialog/css/ui-dialog.css"/>
+<script src="/plugins/artDialog/dist/dialog-min.js"></script>
+
+<!-- 百度地图地址解析 -->
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=HkErbUAcRl98Csyp0dRzZGMj&s=1"></script>
+
+<!-- bootstrap datetimepicker -->
+<link href="/plugins/bootstrapdatetime/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="/plugins/bootstrapdatetime/bootstrap-datetimepicker.min.js"></script>
+<!--<script type="text/javascript" src="/plugins/bootstrapdatetime/bootstrap-datetimepicker.zh-CN.js"></script>-->
+
+<!-- webuploader -->
+<link rel="stylesheet" href="/plugins/webuploader-0.1.5/webuploader.css">
+<script src="/plugins/webuploader-0.1.5/webuploader.js"></script>
+
+<!-- cropper -->
+<link rel="stylesheet" href="/plugins/cropper/cropper.css">
+<style>
+    #wrapper .cropper-wraper .img-preview {
+        position: absolute;
+        right: -290px;
+        top: -30px;
+        width: 300px;
+        height: 160px;
+        margin-top: 1em;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 30px rgba(0, 0, 0, .6);
+    }
+
+    .webuploader-pick:before, .webuploader-pick:after {
+        content: '';
+        display: block;
+        padding-top: 25%;
+    }
+</style>
+<script src="/plugins/cropper/cropper.js"></script>
+<!--<script src="/plugins/cropper/uploader.js"></script>-->
+
+<!-- angular-ueditor 富文本编辑器 -->
+<script type="text/javascript" src="/plugins/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="/plugins/ueditor/ueditor.all.min.js"></script>
+<script type="text/javascript" src="/plugins/angular-ueditor/dist/angular-ueditor.js"></script>
+
+<!-- zeroClipboard -->
+<script type="text/javascript" src="/plugins/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+
+</body>
+</html>

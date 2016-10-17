@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="zh-CN" ng-app="qingniwan.admin">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>INVITE有你更精彩</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content="">
+    <!-- bootstrap css -->
+    <link rel="stylesheet" type="text/css" href="/plugins/bootstrap/css/bootstrap.min.css">
+    <!-- main.css-->
+    <link rel="stylesheet" type="text/css" href="/css/admin/main.css">
+    <!-- iconfont.css-->
+    <link rel="stylesheet" type="text/css" href="/fonts/iconfont.css">
+    <style>
+
+        .modal input {
+            margin-bottom: 10px;
+        }
+
+        .modal-body {
+            overflow: hidden;
+        }
+
+        #wrappers .cropper-wrapers {
+            position: relative;
+            height: 280px;
+        }
+
+        .webuploader-element-invisibles {
+            position: absolute !important;
+            clip: rect(1px 1px 1px 1px);
+            clip: rect(1px, 1px, 1px, 1px);
+        }
+
+        .upload-btns {
+            background: #fff;
+            border: 1px solid #fff;
+            color: #404040;
+            padding: 10px 18px;
+            display: inline-block;
+            border-radius: 3px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .6);
+            position: absolute;
+            right: -260px;
+            bottom: -50px;
+            z-index: 1000;
+        }
+
+        #wrappers .cropper-wrapers .img-previews {
+            position: absolute;
+            right: -290px;
+            top: -30px;
+            width: 300px;
+            height: 160px;
+            margin-top: 1em;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 30px rgba(0, 0, 0, .6);
+        }
+
+        .webuploader-picks:before, .webuploader-picks:after {
+            content: '';
+            display: block;
+            padding-top: 25%;
+        }
+
+        .ItemStyle{
+            position: relative;
+        }
+        .stateStyle{
+            position: absolute;
+            top:50%;
+            right: 0;
+
+        }
+        .AssociatedActivitiesIMG{
+            width:120px;
+            height:auto;
+        }
+    .media-body h4{
+        margin-top: 10px;
+        margin-bottom:20px !important;
+        font-weight: bold;
+        font-size: 16px !important;
+    }
+        .media-body p{
+            margin-bottom:5px !important;
+        }
+        .list-group-item:first-child {
+            border-top-left-radius:0 !important;
+            border-top-right-radius: 0 !important;
+        }
+        .AssociatedActivitiesWell{
+            margin-bottom:0 !important ;
+            border: 0 none!important;
+            padding: 12px !important;
+            margin-bottom: 0 !important;
+        }
+        .AssociatedActivitiesInput{
+            margin-bottom: 0 !important;
+        }
+        .itemAssociatedActivitiesStatus{
+            width: 64px;
+            background: #8a8a8a;
+            border-radius: 10px;
+            color: #fff;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+         .media-right {
+        display: table-cell;
+        vertical-align: middle !important;
+    }
+        .overFlowStyle{
+            height: 508px;
+            overflow-y: scroll;
+            overflow-x: auto;
+            margin-bottom: 0 !important;
+        }
+        #AssociatedActivitiesModal .modal-dialog {
+            width: 900px !important;
+            margin: 30px auto;
+        }
+        #AssociatedActivitiesModal .row{
+            margin-right:0 !important;
+            margin-left:0 !important;
+        }
+        #AssociatedActivitiesModal .col-xs-3,#AssociatedActivitiesModal .col-xs-9{
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        .CheckedShowTitle{
+            text-align: center;
+            height: 58px;
+            margin: 0 !important;
+            background: #f5f5f5;
+            line-height: 58px;
+        }
+        .CheckedShowList{
+            height: 508px;
+            overflow-y: scroll;
+            margin-bottom: 0 !important;
+        }
+        .collectionTitleStyle{
+            font-weight: bold;
+            margin-top: 15px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .AssociatedActivities-wui-page-list{
+            float: left;
+            width: auto;
+            height: 40px;
+            overflow: hidden;
+        }
+        .AssociatedActivities-wui-page-list li a.AssociatedActivitiesActive {
+            background-color: #333;
+            color: #fff;
+        }
+        .AssociatedActivities-wui-page-list li a {
+            display: inline-block;
+            height: 34px;
+            width: 34px;
+            text-align: center;
+            line-height: 34px;
+            border: 1px solid #333;
+            background-color: #fff;
+            color: #333;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .AssociatedActivities-wui-page-list li{
+            float:left
+        }
+        .btnGroupStyle{
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translate(0, -50%);
+        }
+        .wui-main-page {
+            background-color: #f1f1f1;
+            border-radius: 4px 4px 0 0;
+            position: fixed;
+            bottom: 1px !important;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body ng-controller="collectionController" ng-init="initializeBaseData()"  ng-cloak class="ng-cloak">
+
+<div class="container-fluid J_container_overflow">
+
+    <!-- top nav -->
+    <div class="wui-topnav">
+        <div class="row">
+            <div class="col-md-1 col-xs-12 logo">
+                <img src="/images/admin/logo.svg">
+            </div>
+            <div class="col-md-11 col-xs-12 J_topnav-padding">
+                <ul class="wui-topnav-ul">
+                    <li><a href="/?source=1">全部内容</a></li>
+                    <li><a href="/Qnw/release">发布内容</a></li>
+                    <li><a href="/special/index">专题管理</a></li>
+                    <li><a href="/special/create">发布专题</a></li>
+                    <li class="active"><a href="/collection/index">专集管理</a></li>
+                    <li><a href="/collectioneditor/index">发布专集</a></li>
+                  <!--  <li><a href="/usercontrol/index">用户管理</a></li>-->
+                    <li><a href="/statistics/index">数据统计</a></li>
+                    <li><a href="/feedbacks/index">反馈管理</a></li>
+                  <!--  <li><a href="/setting/index">管理员设置</a></li>-->
+                </ul>
+                <li class="J_account pull-right wui-topnav-login" ng-click="logout()">&nbsp;&nbsp;退出</li>
+                <li class="J_account pull-right">您好，<?php session_start();
+                    echo $_SESSION['userName']; ?></li>
+                <li class="pull-right wui-topnav-publish J_topnav_publish" data-toggle="modal" data-target=".create-event">
+                </li>
+            </div>
+        </div>
+    </div>
+
+    <!-- content -->
+    <div class="wui-content">
+        <div class="row">
+
+            <!-- left nav -->
+            <div class="col-md-1 col-xs-12 side" style="text-align:center">
+                <div class="row">
+                    <div class="wui-leftnav J_pc_nav">
+                        <ul>  <!--filter???函数为定义-->
+                            <li ng-click="filter('/interface?interface=collection&api=get&version=2.1','cityID','888888')">全部地区</li>
+                            <li ng-repeat="cityItem in cityList" id="J_area{{cityItem.cityId}}" ng-click="filter('/interface?interface=collection&api=get&version=2.1','cityID',cityItem.cityId)" on-finish-render="callMyCustomMethod">{{cityItem.city}}</li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6 col-xs-offset-3">
+                        <div id="J_mobile_nav" class="dropdown wui-mobile-nav" style="display:none;">
+						  	<span id="dLabel" data-target="#" data-toggle="dropdown" role="button" aria-haspopup="true"
+                                  aria-expanded="false">
+						    	<span id="J_mobile_nav_txt">全部地区</span>
+						    	<span class="caret"></span>
+						  	</span>
+                            <ul>
+                                <li ng-click="filter('/interface?interface=collection&api=get&version=2.1t','cityID','888888')">全部地区</li>
+                                <li ng-repeat="cityItem in cityList" id="J_area{{cityItem.cityId}}" class="active" ng-click="filter('/interface?interface=collection&api=get&version=2.1','cityID','{{cityItem.cityId}}')">{{cityItem.city}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- main -->
+            <div class="col-md-11 col-xs-12 main">
+                <div class="row">
+
+                    <!-- main filter -->
+                    <div class="wui-main-filter clearfix">
+                        <div class="btn-group pull-left">
+
+                            <!--发布专集-->
+                            <a class="btn btn-default" href="/collectioneditor/index?model=create">
+                                <span class="J_filter_public_txt">添加新专集</span>
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </a>
+
+                            <!-- 推荐状态 -->
+                            <div class="btn-group J_filter_status" >
+                                <button type="button" id="dLabel1" class="btn btn-default dropdown-toggle" data-target="#"
+                                        data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <span class="J_filter_status_txt">推荐状态</span>
+                                    <span class="caret"></span>
+                                </button>
+
+                                <ul class="dropdown-menu" aria-labelledby="dLabel1">
+                                        <li>
+                                            <a href="javascript:" ng-click="filter('/interface?interface=collection&api=get&version=2.1','status',2)">上架 </a>
+                                        </li>
+                                    <li>
+                                        <a href="javascript:" ng-click="filter('/interface?interface=collection&api=get&version=2.1','status',1)">下架 </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:" ng-click="filter('/interface?interface=collection&api=get&version=2.1','status',0)">未审核 </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                        <div class="pull-right clearfix">
+
+                            <!-- 搜索 -->
+                            <div class="form-inline pull-right">
+                                <input type="text" id="searchKeyword" name="searchKeyword" ng-model="searchKeywordText" class="form-control"
+                                       placeholder="请输入专集名称" required data-oninvalid="请输入专集名称">
+                                <button type="submit" class="btn btn-default"
+                                        ng-click="searchByKeyword()">
+                                    搜索
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- main listinfo -->
+                    <div class="wui-main J_main_scrollTop">
+                        <div class="wui-main-listinfo" ng-if="collectionsData.dataList.length!=0">
+                            <div class="wui-main-info J_main_info" ng-repeat="itemCollection in collectionsData.dataList track by $index" ><!--callMyCustomMethod??-->
+                                <div class="row ItemStyle">
+                                    <div class="col-md-2">
+                                        <a href="javascript:" style="display: block"><img src="{{itemCollection.url}}" class="img-responsive"></a>
+                                    </div>
+                                    <div class="col-md-6">
+
+                                        <h4 class="collectionTitleStyle">{{itemCollection.title}}</h4>
+                                        <p class="text-muted">{{itemCollection.name}}</p>
+                                        <p class="text-muted">{{itemCollection.phone}}</p>
+                                        <p style="display: none;"> 浏览量</p>
+                                    </div>
+                                    <div class="col-md-4 btnGroupStyle">
+                                        <button type="button" class="btn btn-danger" ng-click="AssociatedActivities(itemCollection)">
+                                            <span class="J_filter_public_txt">关联活动</span>
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                        </button>
+                                        <a href="javascript:" class="btn btn-danger" ng-click="editorCollections(itemCollection, $index)">
+                                         编辑
+                                        </a>
+                                        <span class="badge" ng-if="itemCollection.status==0">未审核</span>
+                                        <span class="badge" ng-if="itemCollection.status==1">已下架</span>
+                                        <span class="badge" ng-if="itemCollection.status==2">已上架</span>
+
+                                        <!-- Split button -->
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-primary" ng-click="audit(itemCollection.id,2,$index)">
+                                                上架
+                                            </button>
+                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                &nbsp;<span class="caret"></span>&nbsp;
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                           <ul class="dropdown-menu">
+                                                <li>
+                                                    <a href="javascript:" ng-click="audit(itemCollection.id,1, $index)">下架</a>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+
+                                        <button data-toggle="modal" data-target="#deleteCollectionModal" type="button"
+                                                class="btn btn-danger" ng-click="deleteCollection(itemCollection.id, $index)">
+                                            删除
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div ng-if="collectionsData.dataList.length==0">没有数据~</div>
+                    </div>
+
+                    <!-- main page -->
+                    <div class="wui-main-page">
+                        <nav>
+                            <ul class="pagination J_pagination">
+                                <li id="J_pagePre">
+                                    <a aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <div class="J_main_page wui-page-list">
+                                </div>
+                                <li id="J_pageNext">
+                                    <a aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认弹出框 -->
+<div class="modal fade" id="deleteCollectionModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">删除</h4>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" ng-click="confirmDeleteCollectionBtn()">确定删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 关联活动弹窗 -->
+<div class="modal fade" id="AssociatedActivitiesModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="row">
+                <div class="col-xs-3">
+                    <h4 class="text-center CheckedShowTitle">已关联活动列表</h4>
+                    <div class="list-group CheckedShowList">
+                        <a href="javasctipt:" class="list-group-item" ng-repeat="itemHasBeenAssociatedForShow in HasBeenAssociatedDataListForShow track by $index">
+                            {{itemHasBeenAssociatedForShow.releasetitle}}
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xs-9">
+                    <div class="well AssociatedActivitiesWell">
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <input type="text" class="form-control AssociatedActivitiesInput" ng-model="AssociatedActivitiesModalSearchByTitleText">
+                            </div>
+                            <div class="col-xs-4">
+                                <a href="javascript:" class="btn btn-default" ng-click="AssociatedActivitiesSearchByTitle()">搜索</a>
+                            </div>
+                            <div class="col-xs-4 text-right">
+                                <!-- <a href="javascript:" class="btn btn-default text-left">x</a>-->
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="list-group overFlowStyle">
+                        <div class="list-group-item" ng-repeat="itemAssociatedActivities in AssociatedActivitiesDataList"><!--on-finish-render="callMyCheckBoxMethod"-->
+                            <div class="media">
+                                <a class="media-left" href="javascript:">
+                                    <img ng-src="{{itemAssociatedActivities.pic}}" class="AssociatedActivitiesIMG">
+                                </a>
+                                <div class="media-body">
+                                    <h4 class="media-heading">{{itemAssociatedActivities.title}}</h4>
+                                    <p class="text-muted">价格:{{itemAssociatedActivities.price}}</p>
+                                    <p class="text-muted">时间:{{itemAssociatedActivities.startTime}}</p>
+                                    <p class="text-muted">地址:{{itemAssociatedActivities.city}}</p>
+                                    <p class="itemAssociatedActivitiesStatus text-muted">{{itemAssociatedActivities.status}}</p>
+                                </div>
+                                <a class="media-right" href="javascript:">
+                                    <input type="checkbox" id="checkBoxId-{{itemAssociatedActivities.uuid}}" ng-checked="itemAssociatedActivities.tagStatus" ng-click="itemAssociatedActivitiesCheckboxBtn(itemAssociatedActivities)">
+                                </a>
+                            </div>
+
+                        </div>
+                    </div><!--1ng-change="loadAssociatedActivitiesPageData()"
+                    <div>
+                        <ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm" boundary-link-numbers="true" rotate="false"></ul>
+                    </div>
+                    2-->
+                    <div class="wui-main-page">
+                            <nav>
+                                <ul class="pagination J_pagination">
+                                    <li id="J_AssociatedActivities_pagePre">
+                                        <a aria-label="Previous">
+                                            <span aria-hidden="true">«</span>
+                                        </a>
+                                    </li>
+                                    <div class="J_AssociatedActivities_main_page AssociatedActivities-wui-page-list"></div>
+                                    <li id="J_AssociatedActivities_pageNext">
+                                        <a aria-label="Next">
+                                            <span aria-hidden="true">»</span>
+                                        </a>
+                                    </li>
+                                </ul> <!--<ul class="pagination J_pagination">
+                                    <li id="J_pagePre">
+                                        <a aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <div class="J_main_page wui-page-list">
+                                    </div>
+                                    <li id="J_pageNext">
+                                        <a aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>-->
+                            </nav>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 后台动态接口 -->
+<div class="interface-info">
+    <input id="J_default_interface" type="hidden" value="<?php echo $source[$sourceid]['interface']; ?>">
+    <input id="J_default_form" type="hidden" value="<?php echo $source[$sourceid]['name']; ?>">
+    <input id="J_default_city" type="hidden" value="<?php echo current($cityinfo)['uuid']; ?>">
+</div>
+
+
+<!-- jquery -->
+<script type="text/javascript" src="/js/framwork/jquery-1.11.1.min.js"></script>
+
+<!-- bootstrap js -->
+<script type="text/javascript" src="/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+<!-- angular js -->
+<script type="text/javascript" src="/js/framwork/angular.js"></script>
+<script type="text/javascript" src="/plugins/angular-ui-bootstrap/ui-bootstrap.min.js"></script>
+<!-- AngularJS - 单页自定义部分 -->
+<script>
+    //qingniwan.value('activityCategoryList', {});
+    var qingniwan = angular.module('qingniwan.admin', ['ui.bootstrap']);
+    qingniwan.value('cityList', <?=$cityList?>);
+</script>
+<!--自定义工具类-->
+<script type="text/javascript" src="/js/model/controllers/collectionController.js"></script>
+<script type="text/javascript" src="/js/model/factory/H5Factory.js"></script>
+
+<!-- artDialog -->
+<link rel="stylesheet" href="/plugins/artDialog/css/ui-dialog.css"/>
+<script src="/plugins/artDialog/dist/dialog-min.js"></script>
+
+<!-- 百度地图地址解析 -->
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=HkErbUAcRl98Csyp0dRzZGMj&s=1"></script>
+
+<!-- bootstrap datetimepicker -->
+<link href="/plugins/bootstrapdatetime/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="/plugins/bootstrapdatetime/bootstrap-datetimepicker.min.js"></script>
+<!--<script type="text/javascript" src="/plugins/bootstrapdatetime/bootstrap-datetimepicker.zh-CN.js"></script>-->
+
+<!-- webuploader -->
+<link rel="stylesheet" href="/plugins/webuploader-0.1.5/webuploader.css">
+<script src="/plugins/webuploader-0.1.5/webuploader.js"></script>
+
+<!-- cropper -->
+<link rel="stylesheet" href="/plugins/cropper/cropper.css">
+<style>
+    #wrapper .cropper-wraper .img-preview {
+        position: absolute;
+        right: -290px;
+        top: -30px;
+        width: 300px;
+        height: 160px;
+        margin-top: 1em;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 30px rgba(0, 0, 0, .6);
+    }
+
+    .webuploader-pick:before, .webuploader-pick:after {
+        content: '';
+        display: block;
+        padding-top: 25%;
+    }
+</style>
+<script src="/plugins/cropper/cropper.js"></script>
+<!--<script src="/plugins/cropper/uploader.js"></script>-->
+
+<!-- angular-ueditor 富文本编辑器 -->
+<script type="text/javascript" src="/plugins/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="/plugins/ueditor/ueditor.all.min.js"></script>
+<script type="text/javascript" src="/plugins/angular-ueditor/dist/angular-ueditor.js"></script>
+
+<!-- zeroClipboard -->
+<script type="text/javascript" src="/plugins/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+
+</body>
+</html>
